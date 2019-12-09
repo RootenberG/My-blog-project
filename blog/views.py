@@ -5,6 +5,7 @@ from django.views.generic import ListView
 from .forms import EmailPostForm, CommentForm
 from django.http import HttpResponse
 from django.core.mail import send_mail
+from taggit.models import Tag
 
 
 def post_share(request, post_id):
@@ -33,8 +34,28 @@ def post_share(request, post_id):
     else:
         form = EmailPostForm()
         return render(
-            request, "blog/post/share.html", {"post": post, "form": form, "sent": sent}
+            request, "blog/post/share.html", {"post": post,
+                                              "form": form, "sent": sent}
         )
+
+
+def post_list(request,tag_slug=None):
+    object_list = Post.published.all()
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        object_list = object_list.filter(tags__in=[tag])
+    paginator = Paginator(object_list, 3)  # По 3 статьи на каждой странице.
+    page = request.GET.get('page')
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        # Если страница не является целым числом, возвращаем первую страницу.
+        posts = paginator.page(1)
+    except EmptyPage:
+        # Если номер страницы больше, чем общее количество страниц, возвращаем последнюю.
+        posts = paginator.page(paginator.num_pages)
+    return render(request, 'blog/post/list.html', {'page': page, 'posts': posts})
 
 
 class PostListView(ListView):
