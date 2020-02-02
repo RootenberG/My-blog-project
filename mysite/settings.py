@@ -27,9 +27,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SITE_ID = 1
+
+
 # Email Backend
 
-SITE_ID = 1
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Application definition
 
@@ -41,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
+    'personal.apps.PersonalConfig',
+    'account',
     'taggit',
     'django_social_share',
     'django.contrib.sites',
@@ -79,6 +86,10 @@ TEMPLATES = [
     },
 ]
 
+
+AUTH_USER_MODEL = 'account.Account'
+
+
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
 
@@ -87,10 +98,8 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'myblogdb',
-        'USER': 'blog',
-        'PASSWORD': 'RootenberG',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -130,4 +139,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+
+STATICFILES_DIRS=[
+    os.path.join(BASE_DIR,'static'),
+    os.path.join(BASE_DIR,'media'),
+]
+
 STATIC_URL = '/static/'
+MEDIA_URL='/media/'
+STATIC_ROOT=os.path.join(BASE_DIR,'static_cdn')
+MEDIA_ROOT=os.path.join(BASE_DIR,'media_cdn')

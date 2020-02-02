@@ -1,12 +1,30 @@
-{% extends "blog/base.html" %}
+{% extends "base.html" %}
 {% load blog_tags %}
+<style class="text/css">
+</style>
 {% block title %} {{ post.title }} {% endblock %}
 {% block content %}
     <h1>{{ post.title }}</h1>
-    <p class="date">Published {{ post.publish }} by {{ post.author }}</p>
-{{ post.body|markdown }}
 
-    <p> <a href="{% url 'blog:post_share' post.id %}">Share this post</a> </p>
+
+{% comment %}
+<p> <a href="{% url 'blog:post_share' post.id %}">Share this post</a> </p>
+{% endcomment %}
+<div class="container">
+    <div class="row">
+        <div class="card m-auto">
+            <img class="card-image-top" src="{{post.image.url}}">
+            <div class="card-body my-2">
+            <h2 class="card-title">{{post.title}}</h2>
+            <p class="card-text">{{post.body|safe}}</p>
+            </div>
+            <div class="card-footer text-muted">
+                Published {{ post.publish }} by {{ post.author }}
+            </div>
+        </div>
+    </div>
+</div>
+    
     <div class="similar_posts">
         <h2>
             Similar posts:
@@ -17,28 +35,33 @@
             {% endfor %}
         </h2>
     </div>
+    {% comment %}
+
     {% with comments.count as total_comments %}
-        <h2>{{ total_comments }} comment {{ total_comments|pluralize }}</h2>
-    {% endwith %}
-    {% for comment in comments %}
-    <div class="comment">
-        <p class="info">
-            Comment {{ forloop.counter }} by {{ comment.name }}
-            {{ comment.created }}
-        </p>
-        {{ comment.body|linebreaks }}
-    </div>
-    {% empty %}
-        <p>There are no comments yet.</p>
-    {% endfor %}
-    {% if new_comment %}
-        <h2>Your comment has been added.</h2>
-    {% else %}
-        <h2>Add a new comment</h2>
-        <form action="." method="post">
-            {{ comment_form.as_p }}
-            {% csrf_token %}
-            <p><input type="submit" value="Add comment"></p>
-        </form>
-    {% endif %}
+    <h2>{{ total_comments }} comment {{ total_comments|pluralize }}</h2>
+{% endwith %}
+{% for comment in comments %}
+<div class="comment">
+    <p class="info">
+        Comment {{ forloop.counter }} by {{ comment.name }}
+        {{ comment.created }}
+    </p>
+    {{ comment.body|linebreaks }}
+</div>
+{% empty %}
+    <p>There are no comments yet.</p>
+{% endfor %}
+{% if new_comment %}
+    <h2>Your comment has been added.</h2>
+{% else %}
+    <h2>Add a new comment</h2>
+    <form action="." method="post">
+        {{ comment_form.as_p }}
+        {% csrf_token %}
+        <p><input type="submit" value="Add comment"></p>
+    </form>
+{% endif %}
+    {% endcomment %}
+        
+   
 {% endblock %}

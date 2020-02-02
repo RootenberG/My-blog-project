@@ -1,8 +1,16 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
 from django.urls import reverse
 from taggit.managers import TaggableManager
+from django.contrib.auth.models import User
+from django.conf import settings
+from django.utils.text import slugify
+
+
+
+def upload_location(instance, filename, **kwargs):
+    file_path = f'blog/{str(instance.author.id)}/{str(instance.title)}-{filename}'
+    return file_path
 
 
 class PublishedManager(models.Manager):
@@ -17,9 +25,11 @@ class Post(models.Model):
     )
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250, unique_for_date='publish')
+    image = models.ImageField(
+        upload_to=upload_location, null=False, blank=False)
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='blog_posts')
-    body = models.TextField()
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='blog_posts')
+    body = models.TextField(null=False, blank=False)
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -33,11 +43,11 @@ class Post(models.Model):
         return reverse('blog:post_detail', args=[self.publish.year,
                                                  self.publish.month, self.publish.day, self.slug])
 
-    class Meta:
-        ordering = ['-publish']
-
     def __str__(self):
         return self.title
+
+    class Meta:
+        ordering = ['-publish']
 
 
 class Comment(models.Model):
@@ -56,4 +66,4 @@ class Comment(models.Model):
     def __str__(self):
         return f'Comment by {self.name} on {self.post}'
 
-# class like(models.Model()):
+# # class like(models.Model()):

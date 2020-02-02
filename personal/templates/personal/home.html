@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<style type="text/css">
+
+	@media (max-width: 768px) { 
+		.right-column{
+			margin-left: 0px;
+		}
+	}
+
+	@media (min-width: 768px) { 
+		.right-column{
+			margin-left: 20px;
+		}
+	}
+
+	.blog-post-container{
+		background-color: #fff;
+		margin-bottom: 20px;
+		width: 100%;
+	}
+	.create-post-bar{
+		background-color: #fff;
+		margin-bottom:20px;
+	}
+
+	.left-column{
+		padding:0px;
+	}
+
+	.right-column{
+		padding:0px;
+	}
+
+</style>
+<div class="container">
+	<div class="row">
+
+		<!-- Top 'create post' bar -->
+		<div class="create-post-bar d-lg-none col-lg-7 offset-lg-1">
+			<p><a href="{% url 'blog:create' %}">Create post</a></p>
+			{% for post in posts %}
+    
+			<h2>
+				<a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+			</h2>
+			<p class="tags">
+				Tags:
+				{% for tag in post.tags.all %}
+					<a href="{% url "blog:post_list_by_tag" tag.slug %}">
+						{{ tag.name }}
+					</a>
+				{% if not forloop.last %}, {% endif %}
+				{% endfor %}
+				</p>
+			<p class="date">
+				Published {{ post.publish }} by {{ post.author }}
+			</p>
+			{{ post.body|truncatewords:30 }}
+			{% endfor %}
+	
+			<!-- Right 'create post' column  -->
+			<div class="right-column col-lg-3 d-lg-flex d-none flex-column">
+	
+				<div class="create-post-bar">
+					<p>Stuff</p>
+					<p>Stuff</p>
+					<p>Stuff</p>
+					<p><a href="{% url 'blog:create' %}">Create post</a></p>
+				</div>
+			
+			</div>
+			<!-- end Right 'create post' column  -->
+	
+		</div>
+	</div>
+	
+		</div>
+		<!-- end Top 'create post' bar -->
+
+
+		<!-- blog feed -->
+		<div class="left-column col-lg-7 offset-lg-1">
+			
+			<div class="blog-post-container">
+				<p>Thingy</p>
+			</div>
+			
+			<div class="blog-post-container">
+				<p>Thingy</p>
+			</div>
+
+			<div class="blog-post-container">
+				<p>Thingy</p>
+			</div>
+
+			<div class="blog-post-container">
+				<p>Thingy</p>
+			</div>
+
+		</div>
+		<!-- end blog feed -->
+		{% for post in posts %}
+    
+        <h2>
+            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+        </h2>
+        <p class="tags">
+            Tags:
+            {% for tag in post.tags.all %}
+                <a href="{% url "blog:post_list_by_tag" tag.slug %}">
+                    {{ tag.name }}
+                </a>
+            {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+            </p>
+        <p class="date">
+            Published {{ post.publish }} by {{ post.author }}
+        </p>
+        {{ post.body|truncatewords:30 }}
+		{% endfor %}
+
+		<!-- Right 'create post' column  -->
+		<div class="right-column col-lg-3 d-lg-flex d-none flex-column">
+
+			<div class="create-post-bar">
+				<p>Stuff</p>
+				<p>Stuff</p>
+				<p>Stuff</p>
+				<p><a href="{% url 'blog:create' %}">Create post</a></p>
+			</div>
+		
+		</div>
+		<!-- end Right 'create post' column  -->
+
+	</div>
+</div>
+
+{% endblock content %}
+
