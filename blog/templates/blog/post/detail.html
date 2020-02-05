@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load blog_tags %}
 <style class="text/css">
+	.create-post-bar{
+		background-color: #fff;
+		margin-bottom:20px;
+	}
 </style>
 {% block title %} {{ post.title }} {% endblock %}
 {% block content %}
@@ -19,25 +23,32 @@
             <p class="card-text">{{post.body|safe}}</p>
             </div>
             <div class="card-footer text-muted">
-                Published {{ post.publish }} by {{ post.author }}
+                Published {{ post.publish }} by {{ post.author.username }}
+            </div>
+            <div class="card create-post-bar d-flex flex-column p-3">
+                
+                {% if not similar %}
+                    <p>Have no similar posts</p>
+                {% else %}
+                    
+                <h3>Similar posts:</h3>
+                <ul> 
+                    {% for post in similar %}
+                        <h2>
+                            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                        </h2>
+                    {% endfor %}
+                {%endif%}
+                </ul>
             </div>
         </div>
     </div>
 </div>
-    
-    <div class="similar_posts">
-        <h2>
-            Similar posts:
-            {% for post in similar %}
-                <h2>
-                    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-                </h2>
-            {% endfor %}
-        </h2>
-    </div>
-    {% comment %}
+ 
+   
+   
 
-    {% with comments.count as total_comments %}
+{% with comments.count as total_comments %}
     <h2>{{ total_comments }} comment {{ total_comments|pluralize }}</h2>
 {% endwith %}
 {% for comment in comments %}
@@ -56,12 +67,12 @@
 {% else %}
     <h2>Add a new comment</h2>
     <form action="." method="post">
-        {{ comment_form.as_p }}
         {% csrf_token %}
+
+        {{ comment_form.as_p }}
         <p><input type="submit" value="Add comment"></p>
     </form>
 {% endif %}
-    {% endcomment %}
         
    
 {% endblock %}

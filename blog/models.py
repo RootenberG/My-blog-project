@@ -5,7 +5,8 @@ from taggit.managers import TaggableManager
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.utils.text import slugify
-
+from django.dispatch import receiver
+from django.db.models.signals import post_delete, pre_save
 
 
 def upload_location(instance, filename, **kwargs):
@@ -24,7 +25,7 @@ class Post(models.Model):
         ('published', 'Published'),
     )
     title = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=250, unique_for_date='publish')
+    slug = models.SlugField(blank=True, unique=True)
     image = models.ImageField(
         upload_to=upload_location, null=False, blank=False)
     author = models.ForeignKey(
@@ -48,6 +49,19 @@ class Post(models.Model):
 
     class Meta:
         ordering = ['-publish']
+
+
+# @receiver(post_delete, sender=Post)
+# def submission_delete(sender, instance, **kwargs):
+#     instance.image.delete(False)
+
+
+# def pre_save_blog_post_receiever(sender, instance, **kwargs):
+#     if not instance.slug:
+#         instance.slug = slugify(instance.author.username+'-'+instance.title)
+
+
+# pre_save.connect(pre_save_blog_post_receiever, sender=Post)
 
 
 class Comment(models.Model):

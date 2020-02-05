@@ -7,7 +7,7 @@ from account.models import Account
 # from django.contrib.postgres.search import TrigramSimilarity
 # from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from .forms import EmailPostForm, CommentForm, SearchForm
-# from django.http import HttpResponse
+from django.http import HttpResponse
 # from django.core.mail import send_mail
 from taggit.models import Tag
 # from django.db.models import Count
@@ -63,15 +63,18 @@ def post_list(request, tag_slug=None):
     except EmptyPage:
         # Если номер страницы больше, чем общее количество страниц, возвращаем последнюю.
         posts = paginator.page(paginator.num_pages)
+    latest_posts = Post.published.all()[0:3]
+
     return render(request, 'blog/post/list.html',
                   {
                       'page': page,
                       'posts': posts,
                       'tag': tag,
+                      'latest_posts':latest_posts
                   })
 
-def edit_blog_view(request,slu):
-    pass
+def comment_added_view(request):
+    return render(request,'blog/post/comment_added.html',{})
 # class PostListView(ListView):
 #     queryset = Post.published.all()
 #     context_object_name = 'posts'
@@ -121,6 +124,7 @@ def post_detail(request, year, month, day, post):
             new_comment.post = post
             # Сохраняем комментарий в базе данных.
             new_comment.save()
+            return redirect('blog:comment_added')
     else:
         comment_form = CommentForm()
     # post_tags_ids = post.tags.values_list('id', flat=True)
@@ -135,6 +139,6 @@ def post_detail(request, year, month, day, post):
                       'comments': comments,
                       'new_comment': new_comment,
                       'comment_form': comment_form,
-                        'similar_posts': similar,
+                      'similar_posts': similar,
                       'similar': similar
                   })
