@@ -4,6 +4,7 @@ from blog.views import (
     post_list,
     post_detail,
     comment_added_view,
+    post_search
 )
 from django.contrib.sitemaps.views import sitemap
 from blog.sitemaps import PostSitemap
@@ -22,12 +23,7 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
          name='django.contrib.sitemaps.views.sitemap'),
     path('feed/', LatestPostsFeed(), name='post_feed'),
-    path('comment_added',comment_added_view,name='comment_added')
+    path('comment_added',comment_added_view,name='comment_added'),
+    path('search/', post_search.as_view(), name='post_search'),
+
 ]
-
-
-#     path('<int:post_id>/share/', views.post_share, name='post_share'),
-#
-#     path('search/', views.post_search, name='post_search'),
-
-# ]

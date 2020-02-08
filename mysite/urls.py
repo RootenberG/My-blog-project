@@ -11,7 +11,6 @@ from account.views import (
     account_view,
     must_authenticate_view,
 )
-from personal.views import home_screen_view
 # from django.contrib.sitemaps.views import sitemap
 # from blog.sitemaps import PostSitemap
 # from personal.views import home_screen_view

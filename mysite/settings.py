@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
-    'personal.apps.PersonalConfig',
     'account',
     'taggit',
     'django_social_share',

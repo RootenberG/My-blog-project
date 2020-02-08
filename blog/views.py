@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post
 from blog.forms import CreateBlogPostForm
 from account.models import Account
+from django.db.models import Q
 # from django.views.generic import ListView
 # from django.contrib.postgres.search import TrigramSimilarity
 # from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
@@ -11,6 +12,7 @@ from django.http import HttpResponse
 # from django.core.mail import send_mail
 from taggit.models import Tag
 # from django.db.models import Count
+from django.views.generic import TemplateView, ListView
 
 
 def create_blog_view(request):
@@ -29,26 +31,24 @@ def create_blog_view(request):
     return render(request, 'blog/createblog.html', contex)
 
 
-# def post_search(request):
-#     form = SearchForm()
-#     query = None
-#     results = []
-#     if 'query' in request.GET:
-#         form = SearchForm(request.GET)
-#         if form.is_valid():
-#             query = form.cleaned_data['query']
-#             search_vector = SearchVector(
-#                 'title', weight='A') + SearchVector('body', weight='B')
-#             search_query = SearchQuery(query)
-#             results = Post.objects.annotate(similarity=TrigramSimilarity('title', query),
-#                                             ).filter(similarity__gte=0.3).order_by('-similarity')
-#     return render(request, 'blog/post/search.html', {'form': form, 'query': query,
-#                                                      'results': results})
+class post_search(ListView):
+    model = Post
+    template_name = 'blog/post/search_results.html'
+
+    def get_queryset(self):  # new
+        query = self.request.GET.get('q')
+        object_list = Post.objects.filter(
+            Q(title__icontains=query) | Q(body__icontains=query)
+        )
+        return object_list
+
 
 def post_list(request, tag_slug=None):
     object_list = Post.published.all()
     tag = None
 
+    if request.GET:
+        query = request.GET['q']
     if tag_slug:
         tag = get_object_or_404(Tag, slug=tag_slug)
         object_list = object_list.filter(tags__in=[tag])
@@ -70,42 +70,14 @@ def post_list(request, tag_slug=None):
                       'page': page,
                       'posts': posts,
                       'tag': tag,
-                      'latest_posts':latest_posts
+                      'latest_posts': latest_posts,
+
+
                   })
 
+
 def comment_added_view(request):
-    return render(request,'blog/post/comment_added.html',{})
-# class PostListView(ListView):
-#     queryset = Post.published.all()
-#     context_object_name = 'posts'
-#     paginate_by = 3
-#     template_name = 'blog/post/list.html'
-
-
-# def post_share(request, post_id):
-#     # Получение статьи по идентификатору.
-#     post = get_object_or_404(Post, id=post_id, status='published')
-#     sent = False
-#     if request.method == 'POST':
-#         # Форма была отправлена на сохранение.
-#         form = EmailPostForm(request.POST)
-#         if form.is_valid():
-#             # Все поля формы прошли валидацию.
-#             cd = form.cleaned_data
-#             # ... Отправка электронной почты.
-#             post_url = request.build_absolute_uri(post.get_absolute_url())
-#             subject = '{} ({}) recommends you reading "\
-#                 {}"'.format(cd['name'], cd['email'], post.title)
-#             message = 'Read "{}" at {}\n\n{}\'s comments:\
-#                 {}'.format(post.title, post_url, cd['name'], cd['comments'])
-#             send_mail(subject, message,
-#                       'savichevdenis244@gmail.com', [cd['to']])
-#             sent = True
-
-#         else:
-#             form = EmailPostForm()
-#             return render(request, 'blog/post/share.html',
-#                           {'post': post, 'form': form, 'sent': sent})
+    return render(request, 'blog/post/comment_added.html', {})
 
 
 def post_detail(request, year, month, day, post):

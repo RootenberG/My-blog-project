@@ -3,7 +3,8 @@
 {% load static %}
 
 {% block title %}My Blog{% endblock %}
-{% block content %}
+
+
 <style type="text/css">
 
 	@media (max-width: 768px) { 
@@ -42,8 +43,12 @@
     }
 </style>
 
- 
-<h1>My Blog</h1>
+
+{% block content %}
+{% if object_list %}
+
+  
+<h1>Search results</h1>
 {% if tag %}
     <h2>Posts tagged with "{{ tag.name }}"</h2>
 {% endif %}
@@ -51,9 +56,9 @@
     <div class="row">
         <div class="posts">
         <h3 class="mx-auto mb-3 font-weight-normal">Blog posts</h3>
-        {% if posts %}             
+        {% if object_list %}             
         <ul>
-            {% for post in posts %}
+            {% for post in object_list %}
                 <h2>
                     <a href="{{ post.get_absolute_url }}" style="text-decoration: none;">
                         <li class="list-group-item"> {{ post.title }}</li></a>
@@ -112,10 +117,12 @@
         </div>
     </div>
 <div class="paginator">
-    {% include "pagination.html" with page=posts %}
+    {% include "pagination.html" with page=object_list %}
 </div>
+{% else %}
+<h2>No posts</h2>
 
 
-
-
+{% endif %}
 {% endblock %}
+  
